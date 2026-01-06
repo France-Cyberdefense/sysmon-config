@@ -99,10 +99,10 @@
 
       <!-- User persistence -->
       <TargetFilename condition="contains">/.ssh/authorized_keys</TargetFilename>
-      <TargetFilename condition="ends with">/.bashrc</TargetFilename>
-      <TargetFilename condition="ends with">/.bash_profile</TargetFilename>
-      <TargetFilename condition="ends with">/.profile</TargetFilename>
-      <TargetFilename condition="ends with">/.bash_aliases</TargetFilename>
+      <TargetFilename condition="contains">/.bashrc</TargetFilename>
+      <TargetFilename condition="contains">/.bash_profile</TargetFilename>
+      <TargetFilename condition="contains">/.profile</TargetFilename>
+      <TargetFilename condition="contains">/.bash_aliases</TargetFilename>
 
       <!-- Autostart -->
       <TargetFilename condition="contains">/.config/autostart/</TargetFilename>

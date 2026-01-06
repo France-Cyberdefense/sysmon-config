@@ -1,0 +1,170 @@
+<Sysmon schemaversion="4.50">
+
+  <!-- ================================================== -->
+  <!-- Sysmon for Linux – SOC Detection Profile            -->
+  <!-- Version : 0.6-soc-full-home-test                    -->
+  <!-- Scope   : Userland + System + Persistence + Network -->
+  <!-- ================================================== -->
+
+  <HashAlgorithms>sha256</HashAlgorithms>
+  <DnsLookup>false</DnsLookup>
+  <CheckRevocation>false</CheckRevocation>
+
+  <EventFiltering>
+
+    <!-- ================================================== -->
+    <!-- EVENT ID 1 – PROCESS CREATE                        -->
+    <!-- Execution / LOLBins / Userland abuse               -->
+    <!-- ================================================== -->
+
+    <ProcessCreate onmatch="include">
+
+      <!-- Execution from user space -->
+      <Image condition="contains">/home/</Image>
+
+      <!-- Interpreters -->
+      <Image condition="contains">/bin/bash</Image>
+      <Image condition="contains">/bin/sh</Image>
+      <Image condition="contains">/usr/bin/python</Image>
+      <Image condition="contains">/usr/bin/python3</Image>
+      <Image condition="contains">/usr/bin/perl</Image>
+      <Image condition="contains">/usr/bin/ruby</Image>
+      <Image condition="contains">/usr/bin/php</Image>
+
+      <!-- LOLBins -->
+      <Image condition="contains">/usr/bin/curl</Image>
+      <Image condition="contains">/usr/bin/wget</Image>
+      <Image condition="contains">/usr/bin/nc</Image>
+      <Image condition="contains">/bin/nc</Image>
+      <Image condition="contains">/usr/bin/socat</Image>
+      <Image condition="contains">/usr/bin/ssh</Image>
+      <Image condition="contains">/usr/bin/scp</Image>
+
+      <!-- Privilege escalation -->
+      <Image condition="contains">/usr/bin/sudo</Image>
+      <Image condition="contains">/bin/su</Image>
+      <Image condition="contains">/usr/bin/pkexec</Image>
+
+      <!-- Persistence tooling -->
+      <Image condition="contains">/usr/bin/crontab</Image>
+      <Image condition="contains">/bin/systemctl</Image>
+      <Image condition="contains">/usr/bin/systemctl</Image>
+
+      <!-- Suspicious commandlines -->
+      <CommandLine condition="contains">/home/</CommandLine>
+      <CommandLine condition="contains">curl</CommandLine>
+      <CommandLine condition="contains">wget</CommandLine>
+      <CommandLine condition="contains">bash</CommandLine>
+      <CommandLine condition="contains">python</CommandLine>
+
+    </ProcessCreate>
+
+    <!-- ================================================== -->
+    <!-- EVENT ID 3 – NETWORK CONNECT                       -->
+    <!-- C2 / Payload download / User tooling               -->
+    <!-- ================================================== -->
+
+    <NetworkConnect onmatch="include">
+
+      <Initiated condition="is">true</Initiated>
+
+      <!-- Userland network activity -->
+      <Image condition="contains">/home/</Image>
+
+      <!-- Tooling -->
+      <Image condition="contains">curl</Image>
+      <Image condition="contains">wget</Image>
+      <Image condition="contains">nc</Image>
+      <Image condition="contains">python</Image>
+      <Image condition="contains">bash</Image>
+      <Image condition="contains">ssh</Image>
+
+    </NetworkConnect>
+
+    <!-- ================================================== -->
+    <!-- EVENT ID 11 – FILE CREATE                          -->
+    <!-- Payloads / Persistence / User activity             -->
+    <!-- ================================================== -->
+
+    <FileCreate onmatch="include">
+
+      <!-- Generic home coverage -->
+      <TargetFilename condition="contains">/home/</TargetFilename>
+
+      <!-- Explicit user folders -->
+      <TargetFilename condition="contains">/Downloads/</TargetFilename>
+      <TargetFilename condition="contains">/Documents/</TargetFilename>
+      <TargetFilename condition="contains">/Pictures/</TargetFilename>
+      <TargetFilename condition="contains">/Desktop/</TargetFilename>
+
+      <!-- User persistence -->
+      <TargetFilename condition="contains">/.ssh/authorized_keys</TargetFilename>
+      <TargetFilename condition="ends with">/.bashrc</TargetFilename>
+      <TargetFilename condition="ends with">/.bash_profile</TargetFilename>
+      <TargetFilename condition="ends with">/.profile</TargetFilename>
+      <TargetFilename condition="ends with">/.bash_aliases</TargetFilename>
+
+      <!-- Autostart -->
+      <TargetFilename condition="contains">/.config/autostart/</TargetFilename>
+
+      <!-- User binaries -->
+      <TargetFilename condition="contains">/.local/bin/</TargetFilename>
+
+      <!-- Cache abuse -->
+      <TargetFilename condition="contains">/.cache/</TargetFilename>
+
+      <!-- Temporary locations -->
+      <TargetFilename condition="contains">/tmp/</TargetFilename>
+      <TargetFilename condition="contains">/var/tmp/</TargetFilename>
+      <TargetFilename condition="contains">/dev/shm/</TargetFilename>
+
+      <!-- System persistence -->
+      <TargetFilename condition="contains">/etc/cron</TargetFilename>
+      <TargetFilename condition="contains">/etc/systemd/system</TargetFilename>
+      <TargetFilename condition="contains">/lib/systemd/system</TargetFilename>
+
+    </FileCreate>
+
+    <!-- ================================================== -->
+    <!-- EVENT ID 23 – FILE DELETE                          -->
+    <!-- Anti-forensics / Cleanup                           -->
+    <!-- ================================================== -->
+
+    <FileDelete onmatch="include">
+
+      <TargetFilename condition="contains">/home/</TargetFilename>
+      <TargetFilename condition="contains">/tmp/</TargetFilename>
+      <TargetFilename condition="contains">/var/tmp/</TargetFilename>
+      <TargetFilename condition="contains">.log</TargetFilename>
+
+    </FileDelete>
+
+    <!-- ================================================== -->
+    <!-- EVENT ID 5 – PROCESS TERMINATE                     -->
+    <!-- Defense evasion                                    -->
+    <!-- ================================================== -->
+
+    <ProcessTerminate onmatch="include">
+
+      <Image condition="contains">auditd</Image>
+      <Image condition="contains">sysmon</Image>
+      <Image condition="contains">rsyslog</Image>
+
+    </ProcessTerminate>
+
+    <!-- ================================================== -->
+    <!-- EVENT ID 7 – IMAGE LOAD                            -->
+    <!-- Credential access / PAM abuse                      -->
+    <!-- ================================================== -->
+
+    <ImageLoad onmatch="include">
+
+      <ImageLoaded condition="contains">libpam</ImageLoaded>
+      <ImageLoaded condition="contains">libkeyutils</ImageLoaded>
+      <ImageLoaded condition="contains">libkrb5</ImageLoaded>
+
+    </ImageLoad>
+
+  </EventFiltering>
+
+</Sysmon>

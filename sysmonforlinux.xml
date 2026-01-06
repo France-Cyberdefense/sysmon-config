@@ -152,18 +152,6 @@
 
     </ProcessTerminate>
 
-    <!-- ================================================== -->
-    <!-- EVENT ID 7 – IMAGE LOAD                            -->
-    <!-- Credential access / PAM abuse                      -->
-    <!-- ================================================== -->
-
-    <ImageLoad onmatch="include">
-
-      <ImageLoaded condition="contains">libpam</ImageLoaded>
-      <ImageLoaded condition="contains">libkeyutils</ImageLoaded>
-      <ImageLoaded condition="contains">libkrb5</ImageLoaded>
-
-    </ImageLoad>
 
   </EventFiltering>
 

@@ -6,10 +6,6 @@
   <!-- Scope   : Userland + System + Persistence + Network -->
   <!-- ================================================== -->
 
-  <HashAlgorithms>sha256</HashAlgorithms>
-  <DnsLookup>false</DnsLookup>
-  <CheckRevocation>false</CheckRevocation>
-
   <EventFiltering>
 
     <!-- ================================================== -->
